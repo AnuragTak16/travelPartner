@@ -1,0 +1,3 @@
+{
+  "extends": "@travelPartner/config/tsconfig.base.json"
+}

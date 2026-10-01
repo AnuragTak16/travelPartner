@@ -1,0 +1,6 @@
+{
+  "extends": "@travelPartner/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  }
+}

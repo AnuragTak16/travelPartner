@@ -1,0 +1,27 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  esbuild: true
+  sharp: true
+  msgpackr-extract: true
+  workerd: true
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+catalog:
+  zod: ^4.5.4
+  typescript: ^6.0.3
+  "@types/node": ^26.4.1
+  varlock: 1.18.0
+  "@trpc/server": ^11.18.0
+  better-auth: 1.7.5
+  lucide-react: ^1.41.0
+  next-themes: ^0.4.6
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  sonner: ^2.0.8
+  "@trpc/client": ^11.18.0
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.7
+  tailwindcss: ^4.3.3
