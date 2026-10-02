@@ -41,5 +41,8 @@
     "typescript": "catalog:",
     "varlock": "catalog:"
   },
-  "packageManager": "pnpm@12.6.0"
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22"
+  }
 }
