@@ -1,8 +1,8 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 import gsap from "@/lib/gsap";
-import { PlacesPreview } from "@/components/places-preview";
 import { trpc } from "@/utils/trpc";
 
 type Transport = "flight" | "train" | "bus" | "car" | "local";
@@ -119,8 +119,8 @@ export function ExplorePanel({ cityQuery, onCityQueryChange }: ExplorePanelProps
               <em> destination.</em>
             </h2>
             <p data-explore-in className="tp-panel-page__lead">
-              Begin with a city. We surface weather, ranked places, and a clear path to
-              what awaits — free sources, no keys.
+              Begin with a city. We surface weather, ranked places, and a path to the full
+              gallery — free sources, no keys.
             </p>
           </div>
 
@@ -198,52 +198,48 @@ export function ExplorePanel({ cityQuery, onCityQueryChange }: ExplorePanelProps
                 </p>
               )}
 
-              <div data-result-in className="tp-concierge__ranks">
+              <div data-result-in id="places" className="tp-concierge__ranks scroll-mt-24">
                 <div className="tp-concierge__ranks-head">
-                  <p>See what awaits</p>
-                  <p>{String(found.recommended.length).padStart(2, "0")}</p>
+                  <p>Places</p>
+                  <p>{String(found.places.length).padStart(2, "0")}</p>
                 </div>
 
                 {found.recommended.length === 0 ? (
                   <p className="text-[var(--tp-muted)]">
-                    No ranked places yet — try another city or open the gallery.
+                    No ranked places yet — try another city.
                   </p>
                 ) : (
                   <ol>
                     {found.recommended.map((p, i) => (
                       <li key={p.id}>
                         <span>{String(i + 1).padStart(2, "0")}</span>
-                        <strong>{p.name}</strong>
-                        <em>{p.category}</em>
+                        <div>
+                          <strong>{p.name}</strong>
+                          <em>{p.category}</em>
+                          {p.weatherReason ? (
+                            <p className="tp-concierge__place-reason">{p.weatherReason}</p>
+                          ) : null}
+                        </div>
                       </li>
                     ))}
                   </ol>
                 )}
-              </div>
 
-              {found.places.length > 0 && (
-                <a
-                  data-result-in
-                  href="#places"
-                  className="tp-cta-line tp-cta-line--dark mt-8 inline-flex"
-                >
-                  See what awaits
-                  <span aria-hidden>→</span>
-                </a>
-              )}
+                {found.places.length > 0 && (
+                  <Link
+                    to="/explore/$city"
+                    params={{ city: found.city.name }}
+                    className="tp-cta-line tp-cta-line--dark mt-8 inline-flex"
+                  >
+                    See all places
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {found && found.places.length > 0 && (
-        <PlacesPreview
-          cityName={found.city.name}
-          weatherLabel={found.weather.label}
-          totalCount={found.places.length}
-          places={found.places}
-        />
-      )}
     </section>
   );
 }

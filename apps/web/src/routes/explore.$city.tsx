@@ -45,56 +45,48 @@ function ExploreCityPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-card-anim]",
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.55, stagger: 0.05, ease: "power2.out" },
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.03, ease: "power2.out" },
       );
     }, rootRef);
     return () => ctx.revert();
   }, [filtered, explore.isFetching]);
 
   return (
-    <main ref={rootRef} className="min-h-svh bg-[var(--tp-ink)] pt-24 text-[var(--tp-fog)]">
-      <div className="mx-auto max-w-7xl px-5 pb-20 md:px-8">
-        <Link
-          to="/"
-          hash="explore"
-          className="text-xs uppercase tracking-[0.2em] text-[var(--tp-muted)] transition-colors hover:text-[var(--tp-fog)]"
-        >
+    <main ref={rootRef} className="tp-gallery">
+      <div className="tp-gallery__shell">
+        <Link to="/" hash="explore" className="tp-gallery__back">
           ← Back to search
         </Link>
 
-        <header className="mt-8 mb-12 md:mb-16">
-          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-[var(--tp-sand)]">
-            Places gallery
-          </p>
-          <h1 className="font-display text-5xl font-extrabold tracking-[-0.03em] md:text-7xl">
-            {found?.city.name ?? cityName}
-          </h1>
+        <header className="tp-gallery__head">
+          <p className="tp-section-kicker">Places</p>
+          <h1 className="tp-gallery__title">{found?.city.name ?? cityName}</h1>
           {found && (
-            <p className="mt-4 max-w-xl text-[var(--tp-muted)]">
-              {found.city.country} · {found.weather.label} · {Math.round(found.weather.temperatureC)}
-              °C · {found.places.length} places with photos from Wikipedia when available
+            <p className="tp-gallery__lead">
+              {found.city.country} · {found.weather.label} ·{" "}
+              {Math.round(found.weather.temperatureC)}°C · {found.places.length} places
             </p>
           )}
         </header>
 
-        {explore.isLoading && (
-          <p className="text-[var(--tp-muted)]">Loading maps, weather, and images…</p>
-        )}
+        {explore.isLoading && <p className="tp-gallery__status">Loading maps and weather…</p>}
 
         {explore.data && !explore.data.found && (
-          <p className="text-[var(--tp-fog)]">{explore.data.message}</p>
+          <p className="tp-gallery__status">{explore.data.message}</p>
         )}
 
         {found && (
           <>
-            <div className="mb-10 flex gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="tp-gallery__filters" role="tablist" aria-label="Categories">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
+                  role="tab"
+                  aria-selected={filter === cat}
                   data-active={filter === cat}
-                  className="tp-chip shrink-0 rounded-none px-4 py-2 text-xs uppercase tracking-[0.16em]"
+                  className="tp-gallery__filter"
                   onClick={() => setFilter(cat)}
                 >
                   {cat === "all" ? "All" : cat}
@@ -102,74 +94,52 @@ function ExploreCityPage() {
               ))}
             </div>
 
-            <div className="tp-place-grid grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((place, i) => {
+            <div className="tp-gallery__grid">
+              {filtered.map((place) => {
                 const open = activeId === place.id;
                 return (
                   <article
                     key={place.id}
                     data-card-anim
-                    className="tp-place-tile group flex cursor-pointer flex-col overflow-hidden border border-[var(--tp-line)] bg-[var(--tp-ink-soft)]"
+                    className="tp-gallery-card"
+                    data-open={open}
                     onClick={() => setActiveId(open ? null : place.id)}
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[var(--tp-ink-mid)]">
+                    <div className="tp-gallery-card__media">
                       {place.imageUrl ? (
-                        <img
-                          src={place.imageUrl}
-                          alt={place.name}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                        />
+                        <img src={place.imageUrl} alt={place.name} loading="lazy" />
                       ) : (
-                        <div className="flex h-full w-full items-end bg-[radial-gradient(ellipse_at_30%_20%,rgba(226,61,18,0.18),transparent_55%),linear-gradient(160deg,#d5e3ea,#e8f1f4)] p-5">
-                          <span className="font-display text-5xl font-bold text-[var(--tp-fog)]/15">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
+                        <div className="tp-gallery-card__empty" aria-label="Image not available">
+                          <span>Image not available</span>
                         </div>
                       )}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(12,36,48,0.75)] to-transparent p-4 pt-16">
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-[#f4f0e8]">
-                          {matchLabel(place.matchScore)} · {place.category}
-                        </p>
+                      <div className="tp-gallery-card__badge">
+                        {matchLabel(place.matchScore)} · {place.category}
                       </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col p-5">
-                      <h2 className="font-display text-xl font-semibold leading-snug md:text-2xl">
-                        {place.name}
-                      </h2>
-                      <p className="mt-2 line-clamp-2 text-sm text-[var(--tp-muted)]">
-                        {place.weatherReason}
-                      </p>
+                    <div className="tp-gallery-card__body">
+                      <h2>{place.name}</h2>
+                      <p className="tp-gallery-card__reason">{place.weatherReason}</p>
 
                       <div
-                        className={`grid transition-[grid-template-rows] duration-500 ${
-                          open ? "mt-4 grid-rows-[1fr]" : "grid-rows-[0fr]"
-                        }`}
+                        className={`tp-gallery-card__details ${open ? "is-open" : ""}`}
                       >
-                        <div className="overflow-hidden">
-                          <p className="text-sm leading-relaxed text-[var(--tp-fog)]/85">
-                            {place.description}
-                          </p>
-                          <p className="mt-3 text-xs text-[var(--tp-muted)]">{place.tip}</p>
-                          <p className="mt-2 text-[10px] uppercase tracking-[0.16em] text-[var(--tp-muted)]">
+                        <div>
+                          <p>{place.description}</p>
+                          <p className="tp-gallery-card__tip">{place.tip}</p>
+                          <p className="tp-gallery-card__meta">
                             {place.avgHours}h · {"$".repeat(place.priceLevel)}
                           </p>
                         </div>
                       </div>
 
-                      <p className="mt-auto pt-4 text-[10px] uppercase tracking-[0.18em] text-[var(--tp-muted)]">
-                        {open ? "Close" : "Details"} →
-                      </p>
+                      <p className="tp-gallery-card__toggle">{open ? "Close" : "Details"} →</p>
                     </div>
                   </article>
                 );
               })}
             </div>
-
-            <p className="mt-12 text-[10px] uppercase tracking-[0.2em] text-[var(--tp-muted)]">
-              OSM Overpass · Open-Meteo · Wikipedia images
-            </p>
           </>
         )}
       </div>

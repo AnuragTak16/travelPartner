@@ -34,7 +34,7 @@ const SERVICES = [
   {
     id: "places-intro",
     label: "Places",
-    title: "See what awaits",
+    title: "Places for this hour",
     copy: "Famous places from open maps — queued for today's light and ready for your gallery when the moment feels right.",
     cta: { href: "#places", label: "Find out more" },
     video: "https://videos.pexels.com/video-files/3571264/3571264-hd_1280_720_30fps.mp4",
@@ -56,8 +56,8 @@ const SERVICES = [
   {
     id: "gallery-intro",
     label: "Gallery",
-    title: "Browse without the scroll",
-    copy: "Once a city is live, open the full place gallery — weather reasons, categories, and the set that fits today.",
+    title: "Open the full gallery",
+    copy: "Once a city is live, open the full place gallery — weather reasons, categories, and photos when Wikipedia has them.",
     cta: { href: "#explore", label: "Find out more" },
     video: "https://videos.pexels.com/video-files/3141208/3141208-hd_1280_720_25fps.mp4",
     poster:
