@@ -56,7 +56,8 @@ function ExploreCityPage() {
     <main ref={rootRef} className="tp-gallery">
       <div className="tp-gallery__shell">
         <Link to="/" hash="explore" className="tp-gallery__back">
-          ← Back to search
+          <span className="tp-gallery__back-icon" aria-hidden />
+          Back to search
         </Link>
 
         <header className="tp-gallery__head">

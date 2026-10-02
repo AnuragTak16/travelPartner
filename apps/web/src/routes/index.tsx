@@ -372,7 +372,8 @@ function HomeComponent() {
           </p>
           <div data-hero-in className="tp-page__cta">
             <a href="#explore" className="tp-btn tp-btn-light px-8 py-4 text-sm uppercase">
-              Search for a destination
+              <span className="hidden sm:inline">Search for a destination</span>
+              <span className="sm:hidden">Search destination</span>
             </a>
             <a href="#services" className="tp-cta-line tp-cta-line--on-dark">
               Scroll to discover
