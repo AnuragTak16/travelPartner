@@ -8,7 +8,9 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "turbo run build --filter=web",
+    "build:all": "turbo run build",
+    "build:server": "turbo run build --filter=server",
     "check-types": "turbo run check-types",
     "dev:web": "turbo run dev:bare -F web --",
     "dev:server": "turbo run dev -F server --",
