@@ -1,32 +1,59 @@
+import { useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 
-import { ModeToggle } from "./mode-toggle";
-import UserMenu from "./user-menu";
+import gsap from "@/lib/gsap";
+
+const NAV_LEFT = [
+  { href: "#services", label: "Services" },
+  { href: "#explore", label: "Explore" },
+  { href: "#budget", label: "Budget" },
+] as const;
 
 export default function Header() {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-  ] as const;
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    gsap.fromTo(
+      ref.current,
+      { y: -12, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.55, ease: "power2.out", delay: 0.15 },
+    );
+
+    const onScroll = () => {
+      const pastHero = window.scrollY > window.innerHeight * 0.85;
+      ref.current?.classList.toggle("is-champagne", pastHero);
+      ref.current?.classList.toggle("is-solid", pastHero);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
-          {links.map(({ to, label }) => {
-            return (
-              <Link key={to} to={to}>
-                {label}
-              </Link>
-            );
-          })}
+    <header ref={ref} className="tp-nav">
+      <div className="tp-nav__inner">
+        <nav className="tp-nav__left" aria-label="Primary">
+          {NAV_LEFT.map((item) => (
+            <a key={item.href} href={item.href}>
+              {item.label}
+            </a>
+          ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <ModeToggle />
-          <UserMenu />
+
+        <Link to="/" className="tp-nav__brand">
+          Travel<em>Partner</em>
+        </Link>
+
+        <div className="tp-nav__right">
+          <a href="#explore" className="tp-nav__book">
+            Search destination
+          </a>
+          <Link to="/login" className="tp-nav__sign hidden sm:inline">
+            Sign in
+          </Link>
         </div>
       </div>
-      <hr />
-    </div>
+    </header>
   );
 }

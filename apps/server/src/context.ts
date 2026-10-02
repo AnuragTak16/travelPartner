@@ -6,9 +6,14 @@ import { db } from "./services";
 import { auth } from "./services";
 
 export async function createContext(opts: CreateExpressContextOptions): Promise<ApiContext> {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(opts.req.headers),
-  });
+  let session = null;
+  try {
+    session = await auth.api.getSession({
+      headers: fromNodeHeaders(opts.req.headers),
+    });
+  } catch {
+    session = null;
+  }
   return {
     db,
     session,

@@ -20,11 +20,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "travelPartner",
+        title: "TravelPartner — Places by weather. Budgets by how you move.",
       },
       {
         name: "description",
-        content: "travelPartner is a web application",
+        content:
+          "Search a city for weather-aware place suggestions and average trip budgets across transport modes.",
       },
     ],
     links: [
@@ -42,11 +43,12 @@ function RootComponent() {
       <HeadContent />
       <ThemeProvider
         attribute="class"
-        defaultTheme="dark"
+        forcedTheme="light"
+        defaultTheme="light"
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        <div className="min-h-svh">
           <Header />
           <Outlet />
         </div>
