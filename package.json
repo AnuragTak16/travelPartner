@@ -41,7 +41,8 @@
     "@types/node": "catalog:",
     "turbo": "^2.10.12",
     "typescript": "catalog:",
-    "varlock": "catalog:"
+    "varlock": "catalog:",
+    "wrangler": "^4.145.0"
   },
   "packageManager": "pnpm@12.6.0",
   "engines": {
