@@ -3,7 +3,7 @@
   "name": "travel-partner-server",
   "main": "./dist/index.mjs",
   "compatibility_date": "2026-10-06",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat_v2"]
   // Monorepo Workers Builds:
   //   Root directory: /
   //   Build command:  pnpm install --frozen-lockfile && pnpm run prisma:generate && pnpm run build:server
