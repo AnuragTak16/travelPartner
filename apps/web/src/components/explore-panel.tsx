@@ -16,7 +16,7 @@ const TRANSPORTS: { id: Transport; label: string }[] = [
 ];
 
 function formatMoney(symbol: string, amount: number) {
-  return `${symbol}${amount.toLocaleString()}`;
+  return `${symbol}${amount.toLocaleString("en-IN")}`;
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {

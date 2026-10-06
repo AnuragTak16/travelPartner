@@ -2,31 +2,33 @@
 @import "@travelPartner/ui/globals.css";
 
 :root {
-  /* Velaa-inspired: ivory ground, soft ink, lagoon accent, sand warmth */
-  --tp-ink: #f3efe8;
-  --tp-ink-soft: #faf8f4;
-  --tp-ink-mid: #e8e2d8;
+  /* Warm ivory / sand surfaces — avoid flat white */
+  --tp-ink: #f0ebe3;
+  --tp-ink-soft: #f4efe7;
+  --tp-ink-mid: #e6dfd4;
   --tp-fog: #1a1c1b;
-  --tp-muted: #6a6660;
+  --tp-muted: #5f5b55;
   --tp-coral: #1f5c57;
   --tp-coral-soft: #2f7a73;
   --tp-lagoon: #2a6b66;
   --tp-sand: #c4b09a;
   --tp-sand-bright: #d9cbb8;
-  --tp-line: rgba(26, 28, 27, 0.12);
+  --tp-line: rgba(26, 28, 27, 0.14);
   --tp-glow: rgba(31, 92, 87, 0.12);
   --tp-glow-lagoon: rgba(42, 107, 102, 0.12);
-  --tp-on-dark: #f7f4ef;
-  --tp-on-dark-muted: rgba(247, 244, 239, 0.72);
+  --tp-on-dark: #f4efe7;
+  --tp-on-dark-muted: rgba(244, 239, 231, 0.72);
   --tp-velaa-dark: #0a0d14;
-  --tp-champagne: #e5e1d5;
+  --tp-champagne: #e8e2d6;
   --tp-champagne-deep: #d8d2c4;
+  --tp-surface: #efe9df;
+  --tp-surface-deep: #e4ddd2;
   --font-display: "Syne", sans-serif;
   --font-black: "Syne", sans-serif;
   --font-body: "DM Sans", sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-move: cubic-bezier(0.33, 1, 0.68, 1);
-  --hero-image: url("https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=2400&q=85");
+  --hero-image: url("https://images.pexels.com/videos/2169880/free-video-2169880.jpg?auto=compress&cs=tinysrgb&w=2400");
   --hero-video: url("https://videos.pexels.com/video-files/2169880/2169880-hd_1280_720_30fps.mp4");
   /* Continuous tropical / lagoon story after the hero */
   --img-story: url("https://images.unsplash.com/photo-1540202404-a2f29016b523?auto=format&fit=crop&w=2200&q=85");
@@ -175,7 +177,7 @@ body {
 }
 
 .tp-btn-light:hover {
-  background: #fff;
+  background: var(--tp-champagne);
   color: var(--tp-fog);
 }
 
@@ -359,7 +361,7 @@ body {
 }
 
 .tp-nav.is-solid {
-  background: rgba(250, 248, 244, 0.92);
+  background: rgba(244, 239, 231, 0.94);
   border-bottom: 1px solid var(--tp-line);
   backdrop-filter: blur(12px);
 }
@@ -423,7 +425,7 @@ body {
 .tp-nav__left {
   display: none;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.85rem;
   flex: 1;
 }
 
@@ -434,10 +436,10 @@ body {
 }
 
 .tp-nav__left a {
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
   color: var(--tp-on-dark-muted);
   transition: color 0.2s ease;
 }
@@ -457,7 +459,7 @@ body {
 .tp-nav__brand {
   flex: 1;
   font-family: var(--font-display);
-  font-size: clamp(1rem, 3.8vw, 1.25rem);
+  font-size: clamp(1.15rem, 3.8vw, 1.4rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   text-transform: none;
@@ -506,11 +508,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.65rem;
+  padding: 0.7rem 1.15rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-transform: none;
   background: var(--tp-fog);
   color: var(--tp-on-dark);
   transition: background 0.2s ease, color 0.2s ease;
@@ -518,9 +520,9 @@ body {
 
 @media (min-width: 768px) {
   .tp-nav__book {
-    padding: 0.6rem 1.05rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -563,12 +565,12 @@ body {
 .tp-nav__drawer {
   display: none;
   border-top: 1px solid var(--tp-line);
-  background: rgba(250, 248, 244, 0.98);
+  background: var(--tp-ink-soft);
   padding: 1.25rem 1.1rem 1.75rem;
 }
 
 .tp-nav.is-open {
-  background: rgba(250, 248, 244, 0.98);
+  background: var(--tp-ink-soft);
   border-bottom: 1px solid var(--tp-line);
 }
 
@@ -588,9 +590,9 @@ body {
 
 .tp-nav__drawer a {
   display: block;
-  padding: 0.85rem 0;
+  padding: 0.95rem 0;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--tp-fog);
@@ -1086,7 +1088,13 @@ body {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  background: #0a1618;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.tp-page__video.is-ready {
+  opacity: 1;
 }
 
 .tp-page--hero .tp-page__brand {

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 const HERO_POSTER =
-  "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=2400&q=85";
+  "https://images.pexels.com/videos/2169880/free-video-2169880.jpg?auto=compress&cs=tinysrgb&w=2400";
 const HERO_VIDEO =
   "https://videos.pexels.com/video-files/2169880/2169880-hd_1280_720_30fps.mp4";
 
@@ -66,6 +66,22 @@ const SERVICES = [
   },
 ] as const;
 
+/** Only one page video should play at a time. */
+let activePageVideo: HTMLVideoElement | null = null;
+
+function playExclusive(video: HTMLVideoElement) {
+  if (activePageVideo && activePageVideo !== video && !activePageVideo.paused) {
+    activePageVideo.pause();
+  }
+  activePageVideo = video;
+  void video.play().catch(() => undefined);
+}
+
+function pauseIfActive(video: HTMLVideoElement) {
+  video.pause();
+  if (activePageVideo === video) activePageVideo = null;
+}
+
 function useInViewVideo(sectionRef: React.RefObject<HTMLElement | null>) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -77,16 +93,27 @@ function useInViewVideo(sectionRef: React.RefObject<HTMLElement | null>) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
-        if (entry.isIntersecting) {
-          void video.play().catch(() => undefined);
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+          if (video.dataset.loaded !== "1") {
+            video.dataset.loaded = "1";
+            video.preload = "metadata";
+            video.load();
+          }
+          playExclusive(video);
         } else {
-          video.pause();
+          pauseIfActive(video);
         }
       },
-      { threshold: 0.28 },
+      {
+        threshold: [0, 0.45, 0.6],
+        rootMargin: "-15% 0px -15% 0px",
+      },
     );
     observer.observe(section);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      pauseIfActive(video);
+    };
   }, [sectionRef]);
 
   return videoRef;
@@ -141,7 +168,7 @@ function CloseSection({ sectionRef }: { sectionRef: React.RefObject<HTMLElement 
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           poster={CLOSE_POSTER}
         >
           <source src={CLOSE_VIDEO} type="video/mp4" />
@@ -185,7 +212,7 @@ function TripBridge() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           poster={BRIDGE_POSTER}
         >
           <source src={BRIDGE_VIDEO} type="video/mp4" />
@@ -246,7 +273,7 @@ function ServiceCard({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           poster={poster}
         >
           <source src={video} type="video/mp4" />
@@ -291,19 +318,31 @@ function HomeComponent() {
     const video = videoRef.current;
     if (!hero || !video) return;
 
+    const markReady = () => {
+      video.classList.add("is-ready");
+    };
+
+    if (video.readyState >= 2) markReady();
+    video.addEventListener("loadeddata", markReady);
+    video.addEventListener("canplay", markReady);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
         if (entry.isIntersecting) {
-          void video.play().catch(() => undefined);
+          playExclusive(video);
         } else {
-          video.pause();
+          pauseIfActive(video);
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.35 },
     );
     observer.observe(hero);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("canplay", markReady);
+    };
   }, []);
 
   useEffect(() => {
@@ -311,25 +350,11 @@ function HomeComponent() {
     if (!hero) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
-
-      tl.fromTo(
-        "[data-hero-media]",
-        { opacity: 0.35 },
-        { opacity: 1, duration: 1.1 },
-      )
-        .fromTo(
-          "[data-hero-veil]",
-          { opacity: 0 },
-          { opacity: 1, duration: 0.7 },
-          "-=0.75",
-        )
-        .fromTo(
-          "[data-hero-in]",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55, stagger: 0.05 },
-          "-=0.4",
-        );
+      gsap.fromTo(
+        "[data-hero-in]",
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out", delay: 0.12 },
+      );
     }, hero);
 
     return () => ctx.revert();
@@ -341,12 +366,15 @@ function HomeComponent() {
 
       {/* Hero */}
       <section ref={heroRef} className="tp-page tp-page--hero" aria-label="TravelPartner">
-        <div data-hero-media className="tp-page__media">
-          <div className="tp-page__media-inner" aria-hidden />
+        <div className="tp-page__media">
+          <div
+            className="tp-page__media-inner"
+            style={{ backgroundImage: `url(${HERO_POSTER})` }}
+            aria-hidden
+          />
           <video
             ref={videoRef}
             className="tp-page__video"
-            autoPlay
             muted
             loop
             playsInline
@@ -356,7 +384,7 @@ function HomeComponent() {
             <source src={HERO_VIDEO} type="video/mp4" />
           </video>
         </div>
-        <div data-hero-veil className="tp-page__veil" aria-hidden />
+        <div className="tp-page__veil" aria-hidden />
 
         <div className="tp-page__body">
           <p data-hero-in className="tp-page__brand">

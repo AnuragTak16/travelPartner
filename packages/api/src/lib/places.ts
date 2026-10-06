@@ -395,11 +395,11 @@ const COUNTRY_COSTS: Record<string, CostProfile> = {
 };
 
 const DEFAULT_COST: CostProfile = {
-  currency: "USD",
-  currencySymbol: "$",
-  dailyBasePerPerson: 60,
-  hotelPerNight: 120,
-  localTransitDay: 8,
+  currency: "INR",
+  currencySymbol: "₹",
+  dailyBasePerPerson: 1500,
+  hotelPerNight: 4500,
+  localTransitDay: 200,
 };
 
 export function costProfileForCountry(countryCode: string): CostProfile {

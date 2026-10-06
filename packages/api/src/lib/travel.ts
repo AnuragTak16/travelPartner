@@ -233,6 +233,12 @@ function toLocalCurrency(amountUsd: number, currency: string): number {
   return Math.round(amountUsd / rate);
 }
 
+function convertAmount(amount: number, fromCurrency: string, toCurrency: string): number {
+  if (fromCurrency === toCurrency) return Math.round(amount);
+  const usd = amount * (FX_TO_USD[fromCurrency] ?? 1);
+  return toLocalCurrency(usd, toCurrency);
+}
+
 function transportCost(
   mode: TransportMode,
   people: number,
@@ -293,13 +299,29 @@ export function estimateBudget(input: BudgetInput): BudgetEstimate {
   const d = Math.max(1, Math.min(days, 30));
   const distanceKm = input.distanceKm ?? 800;
 
+  // Always present estimates in Indian Rupees for this product.
+  const displayCurrency = "INR";
+  const displaySymbol = "₹";
+  const from = city.currency;
+
   const rooms = Math.ceil(p / 2);
-  const lodging = city.hotelPerNight * rooms * d;
-  const foodAndMisc = city.dailyBasePerPerson * p * d;
-  const localTransit = city.localTransitDay * p * d;
+  const lodgingLocal = city.hotelPerNight * rooms * d;
+  const foodLocal = city.dailyBasePerPerson * p * d;
+  const transitLocal = city.localTransitDay * p * d;
+
+  const lodging = convertAmount(lodgingLocal, from, displayCurrency);
+  const foodAndMisc = convertAmount(foodLocal, from, displayCurrency);
+  const localTransit = convertAmount(transitLocal, from, displayCurrency);
 
   const allTransportOptions = (["flight", "train", "bus", "car", "local"] as TransportMode[]).map(
-    (mode) => transportCost(mode, p, distanceKm, city.currency),
+    (mode) => {
+      const option = transportCost(mode, p, distanceKm, from);
+      return {
+        ...option,
+        perPerson: convertAmount(option.perPerson, from, displayCurrency),
+        total: convertAmount(option.total, from, displayCurrency),
+      };
+    },
   );
 
   const selected =
@@ -308,8 +330,8 @@ export function estimateBudget(input: BudgetInput): BudgetEstimate {
   const grandTotal = lodging + foodAndMisc + localTransit + selected.total;
 
   return {
-    currency: city.currency,
-    currencySymbol: city.currencySymbol,
+    currency: displayCurrency,
+    currencySymbol: displaySymbol,
     people: p,
     days: d,
     lodging,
@@ -320,6 +342,6 @@ export function estimateBudget(input: BudgetInput): BudgetEstimate {
     grandTotal,
     perPersonTotal: Math.round(grandTotal / p),
     dailyPerPerson: Math.round(grandTotal / p / d),
-    note: `Mid-range estimate for ${city.country} (${city.countryCode}). Not live pricing.`,
+    note: `Mid-range estimate for ${city.country} (${city.countryCode}), shown in ₹. Not live pricing.`,
   };
 }
