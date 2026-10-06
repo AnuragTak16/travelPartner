@@ -3,7 +3,7 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"]
     },
@@ -11,11 +11,12 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "^db:generate"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": ["^db:generate"]
     },
     "db:push": {
       "cache": false,
@@ -23,7 +24,8 @@
     },
     "db:generate": {
       "cache": false,
-      "interactive": false
+      "inputs": ["prisma/**", "prisma.config.ts"],
+      "outputs": ["prisma/generated/**"]
     },
     "db:migrate": {
       "cache": false,

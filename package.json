@@ -8,9 +8,9 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build --filter=web",
-    "build:all": "turbo run build",
-    "build:server": "turbo run build --filter=server",
+    "build": "pnpm run db:generate && turbo run build --filter=web",
+    "build:all": "pnpm run db:generate && turbo run build",
+    "build:server": "pnpm run db:generate && turbo run build --filter=server",
     "deploy:web": "pnpm run build && pnpm exec wrangler deploy -c apps/web/wrangler.jsonc",
     "check-types": "turbo run check-types",
     "dev:web": "turbo run dev:bare -F web --",
@@ -18,6 +18,7 @@
     "db:push": "turbo run db:push -F @travelPartner/db --",
     "db:studio": "turbo run db:studio -F @travelPartner/db --",
     "db:generate": "turbo run db:generate -F @travelPartner/db --",
+    "prisma:generate": "pnpm run db:generate",
     "db:migrate": "turbo run db:migrate -F @travelPartner/db --",
     "db:start": "docker compose up -d postgres",
     "db:watch": "docker compose up postgres",
@@ -30,7 +31,7 @@
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
     "env:generate": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/",
-    "postinstall": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/",
+    "postinstall": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./packages/db/ && pnpm run db:generate",
     "auth:generate": "cd apps/server && pnpm run auth:generate"
   },
   "dependencies": {

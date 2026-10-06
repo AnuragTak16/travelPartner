@@ -11,11 +11,12 @@
   // pnpm-lock.yaml is detected (catalog: + workspace:* require pnpm).
   // Dashboard settings:
   //   Root directory: /
-  //   Build command:  pnpm install && pnpm run build
+  //   Build command:  pnpm install --frozen-lockfile && pnpm run prisma:generate && pnpm run build
   //   Deploy command: pnpm exec wrangler deploy -c apps/web/wrangler.jsonc
   //   Env (optional): PACKAGE_MANAGER=pnpm
+  // prisma/generated is gitignored — always generate before build.
   "build": {
-    "command": "pnpm run build",
+    "command": "pnpm run prisma:generate && pnpm run build",
     "cwd": "../.."
   }
 }
