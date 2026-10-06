@@ -12,6 +12,7 @@
     "build:all": "pnpm run db:generate && turbo run build",
     "build:server": "pnpm run db:generate && turbo run build --filter=server",
     "deploy:web": "pnpm run build && pnpm exec wrangler deploy -c apps/web/wrangler.jsonc",
+    "deploy:server": "pnpm run prisma:generate && pnpm exec wrangler deploy -c apps/server/wrangler.jsonc",
     "check-types": "turbo run check-types",
     "dev:web": "turbo run dev:bare -F web --",
     "dev:server": "turbo run dev -F server --",

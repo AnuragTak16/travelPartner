@@ -1,0 +1,19 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "travelpartner-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-06",
+  "compatibility_flags": ["nodejs_compat"],
+  // Monorepo Workers Builds:
+  //   Root directory: /
+  //   Build command:  pnpm install --frozen-lockfile && pnpm run prisma:generate && pnpm run build:server
+  //   Deploy command: pnpm exec wrangler deploy -c apps/server/wrangler.jsonc
+  // Runtime secrets (dashboard): BETTER_AUTH_SECRET, DATABASE_URL
+  // Runtime vars: BETTER_AUTH_URL, CORS_ORIGIN
+  // Optional Hyperdrive — uncomment and set your config id:
+  // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<your-hyperdrive-id>" }]
+  "build": {
+    "command": "pnpm run prisma:generate",
+    "cwd": "../.."
+  }
+}

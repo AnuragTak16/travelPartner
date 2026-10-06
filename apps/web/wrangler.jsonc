@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "travelpartner-web",
+  "name": "travelpartner",
   "compatibility_date": "2026-10-06",
   "assets": {
     "directory": "./dist",
@@ -13,6 +13,7 @@
   //   Root directory: /
   //   Build command:  pnpm install --frozen-lockfile && pnpm run prisma:generate && pnpm run build
   //   Deploy command: pnpm exec wrangler deploy -c apps/web/wrangler.jsonc
+  //   Build env: VITE_SERVER_URL=https://travelpartner-server.<account>.workers.dev
   //   Env (optional): PACKAGE_MANAGER=pnpm
   // prisma/generated is gitignored — always generate before build.
   "build": {

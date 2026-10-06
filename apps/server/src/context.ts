@@ -1,19 +1,28 @@
 import type { Context as ApiContext } from "@travelPartner/api/context";
-import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import { fromNodeHeaders } from "better-auth/node";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import type { Context as HonoContext } from "hono";
 
-import { db } from "./services";
-import { auth } from "./services";
+import type { AppServices } from "./services";
 
-export async function createContext(opts: CreateExpressContextOptions): Promise<ApiContext> {
+type TrpcHonoContext = HonoContext<{
+  Variables: { services: AppServices };
+}>;
+
+export async function createContext(
+  opts: FetchCreateContextFnOptions,
+  c: TrpcHonoContext,
+): Promise<ApiContext> {
+  const { auth, db } = c.get("services");
+
   let session = null;
   try {
     session = await auth.api.getSession({
-      headers: fromNodeHeaders(opts.req.headers),
+      headers: opts.req.headers,
     });
   } catch {
     session = null;
   }
+
   return {
     db,
     session,
