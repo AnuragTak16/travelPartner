@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "travelpartner-server",
-  "main": "src/index.ts",
+  "name": "travel-partner-server",
+  "main": "./dist/index.mjs",
   "compatibility_date": "2026-10-06",
   "compatibility_flags": ["nodejs_compat"],
   // Monorepo Workers Builds:
@@ -12,8 +12,4 @@
   // Runtime vars: BETTER_AUTH_URL, CORS_ORIGIN
   // Optional Hyperdrive — uncomment and set your config id:
   // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<your-hyperdrive-id>" }]
-  "build": {
-    "command": "pnpm run prisma:generate",
-    "cwd": "../.."
-  }
 }
