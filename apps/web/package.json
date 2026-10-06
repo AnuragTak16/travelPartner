@@ -10,7 +10,9 @@
     "check-types": "vite build && tsc --noEmit",
     "dev": "vite dev",
     "dev:bare": "vite dev",
-    "env:generate": "varlock codegen"
+    "env:generate": "varlock codegen",
+    "deploy": "wrangler deploy",
+    "deploy:preview": "wrangler versions upload"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -44,6 +46,8 @@
     "postcss": "^8.5.28",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "^8.2.2"
-  }
+    "vite": "^8.2.2",
+    "wrangler": "^4.145.0"
+  },
+  "packageManager": "pnpm@12.6.0"
 }
