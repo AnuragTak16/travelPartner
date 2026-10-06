@@ -391,6 +391,9 @@ importers:
       vite:
         specifier: ^8.2.2
         version: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      wrangler:
+        specifier: ^4.145.0
+        version: 4.145.0(@cloudflare/workers-types@5.20260930.1)(@types/node@26.6.3)
 
   packages/api:
     dependencies:
