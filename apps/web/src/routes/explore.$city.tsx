@@ -42,12 +42,17 @@ function ExploreCityPage() {
 
   useEffect(() => {
     if (!rootRef.current || !filtered.length) return;
+    const cards = rootRef.current.querySelectorAll("[data-card-anim]");
+    gsap.set(cards, { y: 36, opacity: 0 });
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        "[data-card-anim]",
-        { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, stagger: 0.03, ease: "power2.out" },
-      );
+      gsap.to(cards, {
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        stagger: 0.08,
+        ease: "power3.out",
+        clearProps: "transform",
+      });
     }, rootRef);
     return () => ctx.revert();
   }, [filtered, explore.isFetching]);

@@ -33,17 +33,24 @@ function useRevealOnView(ref: React.RefObject<HTMLElement | null>, sel: string) 
     const root = ref.current;
     if (!root) return;
     const els = root.querySelectorAll(sel);
+    if (!els.length) return;
+
+    gsap.set(els, { y: 40, opacity: 0 });
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
-        gsap.fromTo(
-          els,
-          { y: 16, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.04, ease: "power2.out" },
-        );
+        gsap.to(els, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.09,
+          ease: "power3.out",
+          clearProps: "transform",
+        });
         observer.disconnect();
       },
-      { threshold: 0.12 },
+      { threshold: 0.15, rootMargin: "0px 0px -6% 0px" },
     );
     observer.observe(root);
     return () => observer.disconnect();
@@ -81,8 +88,8 @@ export function ExplorePanel({ cityQuery, onCityQueryChange }: ExplorePanelProps
 
     gsap.fromTo(
       el.querySelectorAll("[data-result-in]"),
-      { y: 12, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.4, stagger: 0.03, ease: "power2.out" },
+      { y: 28, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.65, stagger: 0.07, ease: "power3.out" },
     );
   }, [explore.dataUpdatedAt]);
 

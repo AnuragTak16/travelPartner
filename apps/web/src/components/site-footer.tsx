@@ -16,17 +16,24 @@ export function SiteFooter() {
   useEffect(() => {
     if (!ref.current) return;
     const els = ref.current.querySelectorAll("[data-footer-anim]");
+    if (!els.length) return;
+
+    gsap.set(els, { y: 48, opacity: 0 });
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
-        gsap.fromTo(
-          els,
-          { y: 14, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.45, stagger: 0.05, ease: "power2.out" },
-        );
+        gsap.to(els, {
+          y: 0,
+          opacity: 1,
+          duration: 0.85,
+          stagger: 0.12,
+          ease: "power3.out",
+          clearProps: "transform",
+        });
         observer.disconnect();
       },
-      { threshold: 0.1 },
+      { threshold: 0.12 },
     );
     observer.observe(ref.current);
     return () => observer.disconnect();

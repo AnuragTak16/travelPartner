@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { BudgetBoard, ExplorePanel } from "@/components/explore-panel";
 import { SiteFooter } from "@/components/site-footer";
-import gsap from "@/lib/gsap";
+import gsap, { ScrollTrigger } from "@/lib/gsap";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -119,26 +119,101 @@ function useInViewVideo(sectionRef: React.RefObject<HTMLElement | null>) {
   return videoRef;
 }
 
-function useReveal(ref: React.RefObject<HTMLElement | null>, sel = "[data-page-in]") {
+/** Soft whole-block fade — never line-by-line text hops. */
+function useBlockFade(ref: React.RefObject<HTMLElement | null>, sel: string) {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const els = root.querySelectorAll(sel);
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        gsap.fromTo(
-          els,
-          { y: 18, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.04, ease: "power2.out" },
-        );
-        observer.disconnect();
+    const el = root.querySelector(sel);
+    if (!el) return;
+
+    const tween = gsap.fromTo(
+      el,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 1.05,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: root,
+          start: "top 78%",
+          once: true,
+        },
       },
-      { threshold: 0.2 },
     );
-    observer.observe(root);
-    return () => observer.disconnect();
+
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
   }, [ref, sel]);
+}
+
+/** Faith service rhythm: clip-open the video plane, then quiet content fade. */
+function useFaithMediaReveal(sectionRef: React.RefObject<HTMLElement | null>, side: "left" | "right") {
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const media = section.querySelector(".tp-service__media");
+    const layers = section.querySelectorAll(".tp-service__poster, .tp-service__video");
+    const content = section.querySelector(".tp-service__content");
+    if (!media) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        media,
+        { clipPath: "inset(14% 10% 14% 10%)" },
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
+          duration: 1.25,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 78%",
+            once: true,
+          },
+        },
+      );
+
+      if (layers.length) {
+        gsap.fromTo(
+          layers,
+          { scale: 1.16 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (content) {
+        gsap.fromTo(
+          content,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 0.9,
+            ease: "power2.out",
+            delay: 0.2,
+            scrollTrigger: {
+              trigger: section,
+              start: "top 78%",
+              once: true,
+            },
+          },
+        );
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, [sectionRef, side]);
 }
 
 const CLOSE_VIDEO =
@@ -153,7 +228,51 @@ const BRIDGE_POSTER =
 
 function CloseSection({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
   const videoRef = useInViewVideo(sectionRef);
-  useReveal(sectionRef, "[data-close-in]");
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const layers = section.querySelectorAll(".tp-close__poster, .tp-close__video");
+    const body = section.querySelector(".tp-close__body");
+
+    const ctx = gsap.context(() => {
+      if (layers.length) {
+        gsap.fromTo(
+          layers,
+          { scale: 1.2 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (body) {
+        gsap.fromTo(
+          body,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 65%",
+              once: true,
+            },
+          },
+        );
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, [sectionRef]);
 
   return (
     <section ref={sectionRef} id="close" className="tp-close">
@@ -177,14 +296,14 @@ function CloseSection({ sectionRef }: { sectionRef: React.RefObject<HTMLElement 
       </div>
 
       <div className="tp-close__body">
-        <h2 data-close-in className="tp-close__title">
+        <h2 className="tp-close__title">
           <span className="tp-close__lead">Ensure your stay is</span>
           <em>unforgettable</em>
         </h2>
-        <p data-close-in className="tp-close__copy">
+        <p className="tp-close__copy">
           One search. Weather that matters. A quiet sense of cost before you go.
         </p>
-        <div data-close-in className="tp-close__cta">
+        <div className="tp-close__cta">
           <a href="#explore" className="tp-btn tp-btn-light px-10 py-4 text-sm uppercase">
             Search for a destination
           </a>
@@ -197,7 +316,51 @@ function CloseSection({ sectionRef }: { sectionRef: React.RefObject<HTMLElement 
 function TripBridge() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useInViewVideo(sectionRef);
-  useReveal(sectionRef, "[data-bridge-in]");
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const layers = section.querySelectorAll(".tp-bridge__poster, .tp-bridge__video");
+    const body = section.querySelector(".tp-bridge__body");
+
+    const ctx = gsap.context(() => {
+      if (layers.length) {
+        gsap.fromTo(
+          layers,
+          { scale: 1.18 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (body) {
+        gsap.fromTo(
+          body,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 0.95,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 70%",
+              once: true,
+            },
+          },
+        );
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section ref={sectionRef} className="tp-bridge" aria-label="From places to budget">
@@ -221,21 +384,59 @@ function TripBridge() {
       </div>
 
       <div className="tp-bridge__body">
-        <p data-bridge-in className="tp-section-kicker tp-section-kicker--on-dark">
-          Next
-        </p>
-        <h2 data-bridge-in className="tp-bridge__title">
+        <p className="tp-section-kicker tp-section-kicker--on-dark">Next</p>
+        <h2 className="tp-bridge__title">
           Places found.
           <em> Now sense the cost.</em>
         </h2>
-        <p data-bridge-in className="tp-bridge__copy">
+        <p className="tp-bridge__copy">
           You have weather and a shortlist. Before you pack, estimate mid-range spend for
           your crew, days, and how you travel.
         </p>
-        <a data-bridge-in href="#budget" className="tp-cta-line tp-cta-line--on-dark">
+        <a href="#budget" className="tp-cta-line tp-cta-line--on-dark">
           Estimate your trip
           <span aria-hidden>→</span>
         </a>
+      </div>
+    </section>
+  );
+}
+
+function TripMarquee() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const tween = gsap.to(track, {
+      xPercent: -50,
+      duration: 28,
+      ease: "none",
+      repeat: -1,
+    });
+
+    return () => {
+      tween.kill();
+    };
+  }, []);
+
+  const words = ["WEATHER", "PLACES", "BUDGET", "TRIPS", "CITIES", "SKY"];
+  const loop = [...words, ...words];
+
+  return (
+    <section ref={sectionRef} className="tp-scrub-marquee" aria-label="Plan with TravelPartner">
+      <p className="tp-scrub-marquee__script">Plan with</p>
+      <div className="tp-scrub-marquee__viewport" aria-hidden>
+        <div ref={trackRef} className="tp-scrub-marquee__track">
+          {loop.map((word, i) => (
+            <span key={`${word}-${i}`} className="tp-scrub-marquee__item">
+              {word}
+              <span className="tp-scrub-marquee__plus">+</span>
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -253,7 +454,7 @@ function ServiceCard({
 }: (typeof SERVICES)[number]) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useInViewVideo(sectionRef);
-  useReveal(sectionRef, "[data-service-in]");
+  useFaithMediaReveal(sectionRef, side);
 
   return (
     <article
@@ -282,16 +483,10 @@ function ServiceCard({
       </div>
 
       <div className="tp-service__content">
-        <p data-service-in className="tp-service__label">
-          {label}
-        </p>
-        <h3 data-service-in className="tp-service__title">
-          {title}
-        </h3>
-        <p data-service-in className="tp-service__copy">
-          {copy}
-        </p>
-        <a data-service-in href={cta.href} className="tp-cta-line">
+        <p className="tp-service__label">{label}</p>
+        <h3 className="tp-service__title">{title}</h3>
+        <p className="tp-service__copy">{copy}</p>
+        <a href={cta.href} className="tp-cta-line">
           {cta.label}
           <span aria-hidden>→</span>
         </a>
@@ -309,9 +504,8 @@ function HomeComponent() {
   const servicesRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLElement>(null);
 
-  useReveal(worldRef, "[data-world-in]");
-  useReveal(introRef, "[data-intro-in]");
-  useReveal(servicesRef, "[data-services-head]");
+  useBlockFade(introRef, ".tp-faith-intro__inner");
+  useBlockFade(servicesRef, ".tp-services__head");
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -345,19 +539,117 @@ function HomeComponent() {
     };
   }, []);
 
+  // Faith hero: ken-burns scrub on the video plane + quiet whole-body fade (no text hops).
   useEffect(() => {
     const hero = heroRef.current;
     if (!hero) return;
 
+    const layers = hero.querySelectorAll(".tp-page__media-inner, .tp-page__video");
+    const body = hero.querySelector(".tp-page__body");
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        "[data-hero-in]",
-        { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out", delay: 0.12 },
-      );
+      if (layers.length) {
+        gsap.fromTo(
+          layers,
+          { scale: 1.22 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: hero,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (body) {
+        gsap.fromTo(
+          body,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 1.15,
+            ease: "power2.out",
+            delay: 0.45,
+          },
+        );
+      }
     }, hero);
 
     return () => ctx.revert();
+  }, []);
+
+  // Faith split panels: clip-open the two image planes; statement fades as one block.
+  useEffect(() => {
+    const world = worldRef.current;
+    if (!world) return;
+
+    const panels = world.querySelectorAll(".tp-world__panel");
+    const media = world.querySelectorAll(".tp-world__panel-media");
+    const statement = world.querySelector(".tp-world__statement");
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        panels,
+        { clipPath: "inset(20% 10% 20% 10%)" },
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
+          duration: 1.4,
+          stagger: 0.14,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: world,
+            start: "top 72%",
+            once: true,
+          },
+        },
+      );
+
+      if (media.length) {
+        gsap.fromTo(
+          media,
+          { scale: 1.16 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: world,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (statement) {
+        gsap.fromTo(
+          statement,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: world,
+              start: "top 58%",
+              once: true,
+            },
+          },
+        );
+      }
+    }, world);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
   }, []);
 
   return (
@@ -387,18 +679,18 @@ function HomeComponent() {
         <div className="tp-page__veil" aria-hidden />
 
         <div className="tp-page__body">
-          <p data-hero-in className="tp-page__brand">
+          <p className="tp-page__brand">
             Travel<em>Partner</em>
           </p>
-          <h1 data-hero-in className="tp-page__title">
+          <h1 className="tp-page__title">
             For the best trip experience…
             <em> plan with weather.</em>
           </h1>
-          <p data-hero-in className="tp-page__copy">
+          <p className="tp-page__copy">
             Exceptional city knowledge — live sky, ranked places, and a clear sense of
             cost — so your stay stays unforgettable.
           </p>
-          <div data-hero-in className="tp-page__cta">
+          <div className="tp-page__cta">
             <a href="#explore" className="tp-btn tp-btn-light px-8 py-4 text-sm uppercase">
               <span className="hidden sm:inline">Search for a destination</span>
               <span className="sm:hidden">Search destination</span>
@@ -410,7 +702,7 @@ function HomeComponent() {
           </div>
         </div>
 
-        <div data-hero-in className="tp-page__scroll" aria-hidden>
+        <div className="tp-page__scroll" aria-hidden>
           <span>Scroll</span>
           <span className="tp-scroll-cue__line tp-page__scroll-line" />
         </div>
@@ -419,20 +711,20 @@ function HomeComponent() {
       {/* Split statement */}
       <section ref={worldRef} id="story" className="tp-world">
         <div className="tp-world__grid">
-          <div
-            data-world-in
-            className="tp-world__panel"
-            style={{ backgroundImage: `url(${WORLD_LEFT})` }}
-            aria-hidden
-          />
-          <div
-            data-world-in
-            className="tp-world__panel"
-            style={{ backgroundImage: `url(${WORLD_RIGHT})` }}
-            aria-hidden
-          />
+          <div className="tp-world__panel" aria-hidden>
+            <div
+              className="tp-world__panel-media"
+              style={{ backgroundImage: `url(${WORLD_LEFT})` }}
+            />
+          </div>
+          <div className="tp-world__panel" aria-hidden>
+            <div
+              className="tp-world__panel-media"
+              style={{ backgroundImage: `url(${WORLD_RIGHT})` }}
+            />
+          </div>
         </div>
-        <h2 data-world-in className="tp-world__statement">
+        <h2 className="tp-world__statement">
           Come for the cities.
           <br />
           Stay for the feeling.
@@ -442,19 +734,17 @@ function HomeComponent() {
       {/* Faith-style intro band */}
       <section ref={introRef} className="tp-faith-intro">
         <div className="tp-faith-intro__inner">
-          <p data-intro-in className="tp-section-kicker">
-            Dreaming of a trip
-          </p>
-          <h2 data-intro-in className="tp-faith-intro__title">
+          <p className="tp-section-kicker">Dreaming of a trip</p>
+          <h2 className="tp-faith-intro__title">
             Discover our
             <em> trip studio.</em>
           </h2>
-          <p data-intro-in className="tp-faith-intro__copy">
+          <p className="tp-faith-intro__copy">
             Your holiday shouldn&apos;t be spent worrying about logistics. We handle the
             maps, the sky, and a quiet estimate — leaving you free to enjoy the places
             that fit today.
           </p>
-          <a data-intro-in href="#services" className="tp-cta-line tp-cta-line--dark mt-8">
+          <a href="#services" className="tp-cta-line tp-cta-line--dark mt-8">
             Explore our services
             <span aria-hidden>→</span>
           </a>
@@ -464,10 +754,8 @@ function HomeComponent() {
       {/* Continuous video services — Faith Ibiza rhythm */}
       <section ref={servicesRef} id="services" className="tp-services">
         <div className="tp-services__head">
-          <p data-services-head className="tp-section-kicker">
-            What we do
-          </p>
-          <h2 data-services-head className="tp-services__title">
+          <p className="tp-section-kicker">What we do</p>
+          <h2 className="tp-services__title">
             Everything you need,
             <em> in one continuous flow.</em>
           </h2>
@@ -483,6 +771,8 @@ function HomeComponent() {
       <ExplorePanel cityQuery={cityQuery} onCityQueryChange={setCityQuery} />
       <TripBridge />
       <BudgetBoard city={cityQuery} />
+
+      <TripMarquee />
 
       <CloseSection sectionRef={closeRef} />
 

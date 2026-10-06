@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Syne:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Great+Vibes&family=Syne:wght@500;600;700;800&display=swap");
 @import "@travelPartner/ui/globals.css";
 
 :root {
@@ -23,8 +23,11 @@
   --tp-champagne-deep: #d8d2c4;
   --tp-surface: #efe9df;
   --tp-surface-deep: #e4ddd2;
+  --tp-marquee: #2f6f78;
+  --tp-marquee-script: #c5e8ec;
   --font-display: "Syne", sans-serif;
-  --font-black: "Syne", sans-serif;
+  --font-black: "Bebas Neue", "Syne", sans-serif;
+  --font-script: "Great Vibes", cursive;
   --font-body: "DM Sans", sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-move: cubic-bezier(0.33, 1, 0.68, 1);
@@ -656,9 +659,16 @@ body {
 .tp-world__panel {
   position: relative;
   min-height: clamp(22rem, 52svh, 36rem);
+  overflow: hidden;
+  will-change: clip-path;
+}
+
+.tp-world__panel-media {
+  position: absolute;
+  inset: -8%;
   background-size: cover;
   background-position: center;
-  overflow: hidden;
+  will-change: transform;
 }
 
 .tp-world__panel::after {
@@ -670,6 +680,7 @@ body {
     rgba(10, 13, 20, 0.08) 0%,
     rgba(10, 13, 20, 0.35) 100%
   );
+  pointer-events: none;
 }
 
 .tp-world__statement {
@@ -771,6 +782,76 @@ body {
   color: var(--tp-sand-bright);
 }
 
+/* Continuous Faith-style marquee — script above, caps track loops below */
+.tp-scrub-marquee {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  min-height: 58svh;
+  overflow: hidden;
+  background: var(--tp-marquee);
+  color: #fff;
+  padding: clamp(3rem, 8vw, 5rem) 0;
+}
+
+.tp-scrub-marquee__script {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: clamp(2.75rem, 8vw, 5.75rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--tp-marquee-script);
+  pointer-events: none;
+}
+
+.tp-scrub-marquee__viewport {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.tp-scrub-marquee__track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  will-change: transform;
+  font-family: var(--font-black);
+  font-size: clamp(3.75rem, 12vw, 8.5rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.tp-scrub-marquee__item {
+  display: inline-flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  padding-right: 0.35em;
+  white-space: nowrap;
+}
+
+.tp-scrub-marquee__plus {
+  display: inline-block;
+  margin-left: 0.35em;
+  font-size: 0.45em;
+  opacity: 0.65;
+  transform: translateY(-0.15em);
+}
+
 .tp-services__stack {
   display: flex;
   flex-direction: column;
@@ -807,6 +888,7 @@ body {
   min-height: 42svh;
   overflow: hidden;
   background: #0a1618;
+  will-change: clip-path, transform;
 }
 
 @media (min-width: 900px) {
@@ -818,9 +900,12 @@ body {
 .tp-service__poster,
 .tp-service__video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -6%;
+  width: auto;
+  height: auto;
+  min-width: 112%;
+  min-height: 112%;
+  will-change: transform;
 }
 
 .tp-service__poster {
@@ -923,7 +1008,7 @@ body {
 
 .tp-page__media-inner {
   position: absolute;
-  inset: -5%;
+  inset: -8%;
   background-size: cover;
   background-position: center;
   will-change: transform;
@@ -1083,14 +1168,17 @@ body {
 
 .tp-page__video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -8%;
+  width: auto;
+  height: auto;
+  min-width: 116%;
+  min-height: 116%;
   object-fit: cover;
   object-position: center;
   background: transparent;
   opacity: 0;
   transition: opacity 0.45s ease;
+  will-change: transform;
 }
 
 .tp-page__video.is-ready {
@@ -1178,15 +1266,19 @@ body {
 .tp-close__media {
   position: absolute;
   inset: 0;
+  will-change: transform;
 }
 
 .tp-close__poster,
 .tp-close__video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -6%;
+  width: auto;
+  height: auto;
+  min-width: 112%;
+  min-height: 112%;
   object-fit: cover;
+  will-change: transform;
 }
 
 .tp-close__poster {
@@ -1277,15 +1369,19 @@ body {
 .tp-bridge__media {
   position: absolute;
   inset: 0;
+  will-change: transform;
 }
 
 .tp-bridge__poster,
 .tp-bridge__video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -6%;
+  width: auto;
+  height: auto;
+  min-width: 112%;
+  min-height: 112%;
   object-fit: cover;
+  will-change: transform;
 }
 
 .tp-bridge__poster {
@@ -2534,6 +2630,20 @@ body {
 
   .tp-services__title {
     font-size: clamp(1.55rem, 7vw, 2.1rem);
+  }
+
+  .tp-scrub-marquee {
+    min-height: 46svh;
+    gap: 1rem;
+    padding: 2.75rem 0;
+  }
+
+  .tp-scrub-marquee__script {
+    font-size: clamp(2.25rem, 11vw, 3.4rem);
+  }
+
+  .tp-scrub-marquee__track {
+    font-size: clamp(2.85rem, 14vw, 4.25rem);
   }
 
   .tp-service {

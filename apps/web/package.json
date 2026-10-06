@@ -23,6 +23,7 @@
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "^11.18.0",
     "better-auth": "catalog:",
+    "gsap": "^3.15.0",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
